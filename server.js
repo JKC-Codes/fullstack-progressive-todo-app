@@ -14,16 +14,16 @@ const MongoClient = new mongodb.MongoClient(connectionString, {
   useUnifiedTopology: true,
 });
 
-todoRoutes.use(cors());
-todoRoutes.use(express.json());
-todoRoutes.use(express.static('public'));
-todoRoutes.use(express.urlencoded({extended: true}));
-
 app.use(todoRoutes);
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: true}));
+
+todoRoutes.use(cors());
+todoRoutes.use(express.json());
+todoRoutes.use(express.static('public'));
+todoRoutes.use(express.urlencoded({extended: true}));
 
 app.set('view engine', 'ejs');
 
@@ -58,8 +58,15 @@ async function start() {
 		}
 		res.redirect('/');
 	})
-	.patch((req, res) => {})
-	.delete((req, res) => {})
+	.patch((req, res) => {
+		// TODO
+	})
+	.delete(async (req, res) => {
+		if(req.body.uid) {
+			await todoCollection.deleteOne({ "_id":mongodb.ObjectId(req.body.uid) });
+		}
+		res.end();
+	})
 }
 
 start()

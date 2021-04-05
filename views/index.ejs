@@ -13,9 +13,9 @@
 			<p>No todos found</p>
 		<% } else { %>
 			<ul>
-				<% for(const {uid, text, complete} of todos) { %>
+				<% for(const {_id, text, complete} of todos) { %>
 					<% const checked = complete ? 'checked' : '' %>
-					<li data-uid="<%= uid %>" class="todo">
+					<li data-uid="<%= _id %>" class="todo">
 						<label>Mark as done<input type="checkbox" class="checkbox-done" <%= checked %>></label>
 						<span class="todo-text"><%= text %></span>
 						<button type="button" class="button-edit">Edit</button>
