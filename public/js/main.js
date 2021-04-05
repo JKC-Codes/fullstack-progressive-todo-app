@@ -1,43 +1,125 @@
-const todos = document.querySelectorAll('.todo');
-const formSubmit = document.querySelector('.form-submit');
+const todosSection = document.querySelector('.section-todos');
+const formSubmit = document.querySelector('#form-submit');
 
 
-todos.forEach(todo => {
+todosSection.querySelectorAll('.todo').forEach(todo => {
 	addTodoListeners(todo);
 });
 
+formSubmit.querySelector('button[type=submit]').addEventListener('click', addTodo);
+
+function updateTodos(updatedTodos) {
+	if(updatedTodos.length === 0) {
+		const text = document.createElement('p');
+		text.textContent = 'No todos found';
+
+		todosSection.replaceChildren(text);
+		return;
+	}
+
+	let newTodoList = document.createElement('ul');
+	newTodoList.className = 'list-todos';
+
+	updatedTodos.forEach(todo => {
+		const li = document.createElement('li');
+		const label = document.createElement('label');
+		const checkbox = document.createElement('input');
+		const text = document.createElement('span');
+		const editButton = document.createElement('button');
+		const deleteButton = document.createElement('button');
+
+		label.textContent = 'Mark as done';
+		text.textContent = todo.text;
+		editButton.textContent = 'Edit';
+		deleteButton.textContent = 'Delete';
+
+		li.className = 'todo';
+		li.setAttribute('data-uid', todo._id);
+		checkbox.className = 'checkbox-done';
+		checkbox.setAttribute('type', 'checkbox');
+		if(todo.done) {
+			checkbox.setAttribute('checked', 'true');
+		}
+		text.className = 'todo-text';
+		editButton.className = 'button-edit';
+		editButton.setAttribute('type', 'button');
+		deleteButton.className = 'button-delete';
+		deleteButton.setAttribute('type', 'button');
+
+		label.appendChild(checkbox);
+		li.appendChild(label);
+		li.appendChild(text);
+		li.appendChild(editButton);
+		li.appendChild(deleteButton);
+
+		addTodoListeners(li);
+		newTodoList.append(li);
+	});
+
+	todosSection.replaceChildren(newTodoList);
+}
 
 function addTodoListeners(todo) {
 	const checkboxDone = todo.querySelector('.checkbox-done');
 	const buttonEdit = todo.querySelector('.button-edit');
 	const buttonDelete = todo.querySelector('.button-delete');
 
-	checkboxDone.addEventListener('click', completeTodo);
+	checkboxDone.addEventListener('click', toggleTodoDone);
 	buttonEdit.addEventListener('click', editTodo);
 	buttonDelete.addEventListener('click', deleteTodo);
 }
 
-function addTodo(event) {
-	// TODO
+async function addTodo(event) {
+	event.preventDefault();
+
+	try {
+		const todoValue = formSubmit.querySelector('input[name="text"]').value;
+
+		if(todoValue.length === 0) {
+			return;
+		}
+
+		const fetchOptions = {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json'
+			},
+			body: JSON.stringify({text: todoValue})
+		};
+		const response = await fetch('/api/todos', fetchOptions);
+		const data = await response.json();
+
+		updateTodos(data.todos);
+		formSubmit.reset();
+	}
+	catch(err) {
+		console.error(err);
+	}
 };
 
-function deleteTodo(event) {
-	const todo = event.currentTarget.parentElement;
+async function deleteTodo(event) {
+	const todo = event.currentTarget.closest('.todo');
 	const uid = todo.dataset.uid;
-
-	fetch('/api/todos', {
+	const fetchOptions = {
 		method: 'DELETE',
 		headers: {
 			'Content-type': 'application/json'
 		},
 		body: JSON.stringify({uid: uid})
-	})
-	.catch(err => {
+	};
+
+	try {
+		const response = await fetch('/api/todos', fetchOptions);
+		const data = await response.json();
+
+		updateTodos(data.todos);
+	}
+	catch(err) {
 		console.error(err);
-	})
+	}
 };
 
-function completeTodo(event) {
+function toggleTodoDone(event) {
 	// TODO
 };
 

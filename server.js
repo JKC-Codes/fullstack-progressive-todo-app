@@ -43,9 +43,12 @@ async function start() {
 		throw new Error(err);
 	}
 
+	async function getTodos() {
+		return await todoCollection.find().sort({text: 1}).toArray();
+	}
+
 	app.get('/', async (req, res) => {
-		const todos = await todoCollection.find().sort({text: 1}).toArray();
-		res.render('index.ejs', {todos: todos});
+		res.render('index.ejs', {todos: await getTodos()});
 	});
 
 	todoRoutes.route('/api/todos')
@@ -53,19 +56,20 @@ async function start() {
 		if(req.body.text) {
 			await todoCollection.insertOne({
 				text: req.body.text,
-				complete: false
+				done: false
 			});
 		}
-		res.redirect('/');
+		res.send({todos: await getTodos()});
 	})
 	.patch((req, res) => {
 		// TODO
 	})
 	.delete(async (req, res) => {
 		if(req.body.uid) {
-			await todoCollection.deleteOne({ "_id":mongodb.ObjectId(req.body.uid) });
+			await todoCollection.deleteOne({_id: mongodb.ObjectId(req.body.uid)});
 		}
-		res.end();
+
+		res.send({todos: await getTodos()});
 	})
 }
 
