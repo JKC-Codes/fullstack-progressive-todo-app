@@ -9,12 +9,12 @@
 	</head>
 	<body>
 		<h2>Todos</h2>
-		<ul>
-			<% if(todos.length === 0) { %>
-				<li>No todos found</li>
-			<% } else { %>
-				<% for(const {uid, text, completed} of todos) { %>
-					<% const checked = completed ? 'checked' : '' %>
+		<% if(todos.length === 0) { %>
+			<p>No todos found</p>
+		<% } else { %>
+			<ul>
+				<% for(const {uid, text, complete} of todos) { %>
+					<% const checked = complete ? 'checked' : '' %>
 					<li data-uid="<%= uid %>" class="todo">
 						<label>Mark as done<input type="checkbox" class="checkbox-done" <%= checked %>></label>
 						<span class="todo-text"><%= text %></span>
@@ -22,11 +22,11 @@
 						<button type="button" class="button-delete">Delete</button>
 					</li>
 				<% } %>
-			<% } %>
-		</ul>
+			</ul>
+		<% } %>
 
 		<h2>Add A Todo</h2>
-		<form action="/api/" method="post" id="form-submit">
+		<form action="/api/todos" method="post" id="form-submit">
 			<label>New todo: <input type="text" name="text"></label>
 			<button type="submit">Add todo</button>
 		</form>
