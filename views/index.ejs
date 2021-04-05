@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en-gb">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Fullstack Todo App</title>
+		<link rel="stylesheet" href="/css/main.css">
+		<script src="/js/main.js" defer></script>
+	</head>
+	<body>
+		<h2>Todos</h2>
+		<ul>
+			<% if(todos.length === 0) { %>
+				<li>No todos found</li>
+			<% } else { %>
+				<% for(const {uid, text, completed} of todos) { %>
+					<% const checked = completed ? 'checked' : '' %>
+					<li data-uid="<%= uid %>" class="todo">
+						<label>Mark as done<input type="checkbox" class="checkbox-done" <%= checked %>></label>
+						<span class="todo-text"><%= text %></span>
+						<button type="button" class="button-edit">Edit</button>
+						<button type="button" class="button-delete">Delete</button>
+					</li>
+				<% } %>
+			<% } %>
+		</ul>
+
+		<h2>Add A Todo</h2>
+		<form action="/api/" method="post" id="form-submit">
+			<label>New todo: <input type="text" name="text"></label>
+			<button type="submit">Add todo</button>
+		</form>
+	</body>
+</html>
