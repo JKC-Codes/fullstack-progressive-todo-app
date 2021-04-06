@@ -30,6 +30,12 @@ function updateTodos(updatedTodos) {
 
 		label.textContent = 'Mark as done';
 		text.textContent = todo.text;
+		if(todo.done) {
+			const textNodes = text.childNodes;
+			const strikethrough = document.createElement('s');
+			strikethrough.append(...textNodes);
+			text.replaceChildren(strikethrough);
+		}
 		editButton.textContent = 'Edit';
 		deleteButton.textContent = 'Delete';
 
@@ -46,11 +52,11 @@ function updateTodos(updatedTodos) {
 		deleteButton.className = 'button-delete';
 		deleteButton.setAttribute('type', 'button');
 
-		label.appendChild(checkbox);
-		li.appendChild(label);
-		li.appendChild(text);
-		li.appendChild(editButton);
-		li.appendChild(deleteButton);
+		label.append(checkbox);
+		li.append(label);
+		li.append(text);
+		li.append(editButton);
+		li.append(deleteButton);
 
 		addTodoListeners(li);
 		newTodoList.append(li);
@@ -119,8 +125,27 @@ async function deleteTodo(event) {
 	}
 };
 
-function toggleTodoDone(event) {
-	// TODO
+async function toggleTodoDone(event) {
+	const todo = event.currentTarget.closest('.todo');
+	const uid = todo.dataset.uid;
+	const checkbox = todo.querySelector('.checkbox-done');
+	const fetchOptions = {
+		method: 'PATCH',
+		headers: {
+			'Content-type': 'application/json'
+		},
+		body: JSON.stringify({uid: uid, done: checkbox.checked})
+	};
+
+	try {
+		const response = await fetch('/api/todos', fetchOptions);
+		const data = await response.json();
+
+		updateTodos(data.todos);
+	}
+	catch(err) {
+		console.error(err);
+	}
 };
 
 function editTodo(event) {

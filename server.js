@@ -59,10 +59,25 @@ async function start() {
 				done: false
 			});
 		}
+
 		res.send({todos: await getTodos()});
 	})
-	.patch((req, res) => {
-		// TODO
+	.patch(async (req, res) => {
+		const amendments = {}
+
+		for(const [key, value] of Object.entries(req.body)) {
+			if(key === '_id') {
+				continue;
+			}
+			amendments[key] = value;
+		}
+
+		await todoCollection.findOneAndUpdate(
+			{_id: mongodb.ObjectId(req.body.uid)},
+			{$set: amendments},
+		);
+
+		res.send({todos: await getTodos()});
 	})
 	.delete(async (req, res) => {
 		if(req.body.uid) {
