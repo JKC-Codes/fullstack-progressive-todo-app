@@ -31,7 +31,9 @@ app.listen(port, function() {
 	console.log(`Server listening on port ${port}`);
 });
 
+
 async function start() {
+	const fallbackRequests = ['submit', 'save', 'edit', 'delete'];
 	let todoCollection;
 
 	try {
@@ -52,40 +54,68 @@ async function start() {
 	});
 
 	todoRoutes.route('/api/todos')
+	.get((req, res) => {
+		res.redirect('/');
+	})
 	.post(async (req, res) => {
-		if(req.body.text) {
-			await todoCollection.insertOne({
-				text: req.body.text,
-				done: false
-			});
+		if(fallbackRequests.includes(req.body.button)) {
+			await handleFallbacks(req, res);
+			return;
 		}
-
+		else if(req.body.text) {
+			await addTodo(req.body.text);
+		}
 		res.send({todos: await getTodos()});
 	})
 	.patch(async (req, res) => {
-		const amendments = {}
-
-		for(const [key, value] of Object.entries(req.body)) {
-			if(key === '_id') {
-				continue;
-			}
-			amendments[key] = value;
-		}
-
-		await todoCollection.findOneAndUpdate(
-			{_id: mongodb.ObjectId(req.body.uid)},
-			{$set: amendments},
-		);
-
+		await editTodo(req.body);
 		res.send({todos: await getTodos()});
 	})
 	.delete(async (req, res) => {
 		if(req.body.uid) {
-			await todoCollection.deleteOne({_id: mongodb.ObjectId(req.body.uid)});
+			await deleteTodo(req.body.uid);
 		}
-
 		res.send({todos: await getTodos()});
 	})
+
+
+	async function handleFallbacks(req, res) {
+		switch(req.body.button) {
+			case 'submit': await addTodo(req.body.text);
+				break;
+			case 'save':
+			case 'edit': await editTodo(req.body);
+				break;
+			case 'delete': await deleteTodo(req.body.uid);
+				break;
+		}
+		res.redirect('/');
+	}
+
+	async function addTodo(text) {
+		await todoCollection.insertOne({
+			text: text,
+			done: 'false'
+		});
+	}
+
+	async function editTodo(reqBody) {
+		const amendments = {done: 'false'}
+		for(const [key, value] of Object.entries(reqBody)) {
+			if(key === 'uid' || key === 'button') {
+				continue;
+			}
+			amendments[key] = value;
+		}
+		await todoCollection.findOneAndUpdate(
+			{_id: mongodb.ObjectId(reqBody.uid)},
+			{$set: amendments},
+		);
+	}
+
+	async function deleteTodo(uid) {
+		await todoCollection.deleteOne({_id: mongodb.ObjectId(uid)});
+	}
 }
 
 start()
