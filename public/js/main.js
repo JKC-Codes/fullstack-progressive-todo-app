@@ -141,18 +141,38 @@ function editTodo(event) {
 	event.preventDefault();
 	const todo = event.currentTarget.closest('.todo');
 	showInput(todo);
-	// TODO
 };
 
-function saveTodo(event) {
+async function saveTodo(event) {
 	event.preventDefault();
+
 	const todo = event.currentTarget.closest('.todo');
+	const uid = todo.querySelector('.uid').value;
+	const text = todo.querySelector('.input-text').value;
+	const fetchOptions = {
+		method: 'PATCH',
+		headers: {
+			'Content-type': 'application/json'
+		},
+		body: JSON.stringify({uid: uid, text: text})
+	};
+
 	hideInput(todo);
-	// TODO
+
+	try {
+		const response = await fetch('/api/todos', fetchOptions);
+		const data = await response.json();
+
+		updateTodos(data.todos);
+	}
+	catch(err) {
+		console.error(err);
+	}
 };
 
 
 function updateTodos(updatedTodos) {
+	window.location.reload();
 	return;
 	if(updatedTodos.length === 0) {
 		const text = document.createElement('p');
