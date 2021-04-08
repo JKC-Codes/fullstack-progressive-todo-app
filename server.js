@@ -33,7 +33,7 @@ app.listen(port, function() {
 
 
 async function start() {
-	const fallbackRequests = ['submit', 'save', 'edit', 'delete'];
+	const fallbackRequests = ['submit', 'save', 'delete'];
 	let todoCollection;
 
 	try {
@@ -84,7 +84,11 @@ async function start() {
 			case 'submit': await addTodo(req.body.text);
 				break;
 			case 'save':
-			case 'edit': await editTodo(req.body);
+				delete req.body.button;
+				if(req.body.done !== 'true') {
+					req.body.done = 'false';
+				}
+				await editTodo(req.body);
 				break;
 			case 'delete': await deleteTodo(req.body.uid);
 				break;
@@ -100,9 +104,9 @@ async function start() {
 	}
 
 	async function editTodo(reqBody) {
-		const amendments = {done: 'false'}
+		const amendments = {}
 		for(const [key, value] of Object.entries(reqBody)) {
-			if(key === 'uid' || key === 'button') {
+			if(key === 'uid') {
 				continue;
 			}
 			amendments[key] = value;
