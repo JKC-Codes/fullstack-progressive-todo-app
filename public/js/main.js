@@ -1,6 +1,4 @@
-const todosSection = document.querySelector('.section-todos');
 const formSubmit = document.querySelector('#form-submit');
-
 
 document.querySelectorAll('.todo').forEach(todo => {
 	addTodoListeners(todo);
@@ -17,49 +15,9 @@ function addTodoListeners(todo) {
 	const buttonDelete = todo.querySelector('.button-delete');
 
 	checkboxDone.addEventListener('click', toggleTodoDone);
-	buttonSave.addEventListener('click', saveTodo);
+	buttonSave.addEventListener('click', saveTodoEdit);
 	buttonEdit.addEventListener('click', editTodo);
 	buttonDelete.addEventListener('click', deleteTodo);
-}
-
-function hideInput(todo) {
-	const inputText = todo.querySelector('.input-text');
-	const labelCheckboxDone = todo.querySelector('.label-checkbox-done');
-	const buttonSave = todo.querySelector('.button-save');
-	const buttonEdit = todo.querySelector('.button-edit');
-	const buttonDelete = todo.querySelector('.button-delete');
-	const text = inputText.value;
-	const span = document.createElement('span');
-
-	labelCheckboxDone.removeAttribute('hidden');
-	buttonSave.setAttribute('hidden', '');
-	buttonEdit.removeAttribute('hidden');
-	buttonDelete.removeAttribute('hidden');
-
-	span.className = 'span-text';
-	span.textContent = text;
-	inputText.replaceWith(span);
-}
-
-function showInput(todo) {
-	const spanText = todo.querySelector('.span-text');
-	const labelCheckboxDone = todo.querySelector('.label-checkbox-done');
-	const buttonSave = todo.querySelector('.button-save');
-	const buttonEdit = todo.querySelector('.button-edit');
-	const buttonDelete = todo.querySelector('.button-delete');
-	const text = spanText.textContent;
-	const input = document.createElement('input');
-
-	labelCheckboxDone.setAttribute('hidden', '');
-	buttonSave.removeAttribute('hidden');
-	buttonEdit.setAttribute('hidden', '');
-	buttonDelete.setAttribute('hidden', '');
-
-	input.className = 'input-text';
-	input.value = text;
-	input.setAttribute('type', 'text');
-	input.setAttribute('name', 'text');
-	spanText.replaceWith(input);
 }
 
 async function addTodo(event) {
@@ -143,7 +101,7 @@ function editTodo(event) {
 	showInput(todo);
 };
 
-async function saveTodo(event) {
+async function saveTodoEdit(event) {
 	event.preventDefault();
 
 	const todo = event.currentTarget.closest('.todo');
@@ -170,15 +128,57 @@ async function saveTodo(event) {
 	}
 };
 
+function hideInput(todo) {
+	const inputText = todo.querySelector('.input-text');
+	const labelCheckboxDone = todo.querySelector('.label-checkbox-done');
+	const buttonSave = todo.querySelector('.button-save');
+	const buttonEdit = todo.querySelector('.button-edit');
+	const buttonDelete = todo.querySelector('.button-delete');
+	const text = inputText.value;
+	const span = document.createElement('span');
+
+	labelCheckboxDone.removeAttribute('hidden');
+	buttonSave.setAttribute('hidden', '');
+	buttonEdit.removeAttribute('hidden');
+	buttonDelete.removeAttribute('hidden');
+
+	span.className = 'span-text';
+	span.textContent = text;
+	inputText.replaceWith(span);
+}
+
+function showInput(todo) {
+	const spanText = todo.querySelector('.span-text');
+	const labelCheckboxDone = todo.querySelector('.label-checkbox-done');
+	const buttonSave = todo.querySelector('.button-save');
+	const buttonEdit = todo.querySelector('.button-edit');
+	const buttonDelete = todo.querySelector('.button-delete');
+	const text = spanText.textContent;
+	const input = document.createElement('input');
+
+	labelCheckboxDone.setAttribute('hidden', '');
+	buttonSave.removeAttribute('hidden');
+	buttonEdit.setAttribute('hidden', '');
+	buttonDelete.setAttribute('hidden', '');
+
+	input.className = 'input-text';
+	input.value = text;
+	input.setAttribute('type', 'text');
+	input.setAttribute('name', 'text');
+	spanText.replaceWith(input);
+}
 
 function updateTodos(updatedTodos) {
-	window.location.reload();
-	return;
+	const noTodosPlaceholder = document.querySelector('.no-todos-placeholder');
+	const listTodos = document.querySelector('.list-todos');
+	const currentTodoList = noTodosPlaceholder || listTodos;
+
 	if(updatedTodos.length === 0) {
 		const text = document.createElement('p');
+		text.className = 'no-todos-placeholder';
 		text.textContent = 'No todos found';
 
-		todosSection.replaceChildren(text);
+		currentTodoList.replaceWith(text);
 		return;
 	}
 
@@ -187,45 +187,82 @@ function updateTodos(updatedTodos) {
 
 	updatedTodos.forEach(todo => {
 		const li = document.createElement('li');
-		const label = document.createElement('label');
-		const checkbox = document.createElement('input');
+		const form = document.createElement('form');
+		const inputUID = document.createElement('input');
+		const labelInputCheckbox = document.createElement('label');
+		const inputCheckbox = document.createElement('input');
+		const textTodo = document.createElement('span');
+		const strikethrough = document.createElement('s');
 		const text = document.createElement('span');
-		const editButton = document.createElement('button');
-		const deleteButton = document.createElement('button');
-
-		label.textContent = 'Mark as done';
-		text.textContent = todo.text;
-		if(todo.done) {
-			const textNodes = text.childNodes;
-			const strikethrough = document.createElement('s');
-			strikethrough.append(...textNodes);
-			text.replaceChildren(strikethrough);
-		}
-		editButton.textContent = 'Edit';
-		deleteButton.textContent = 'Delete';
+		const buttonSave = document.createElement('button');
+		const buttonEdit = document.createElement('button');
+		const buttonDelete = document.createElement('button');
 
 		li.className = 'todo';
-		li.setAttribute('data-uid', todo._id);
-		checkbox.className = 'checkbox-done';
-		checkbox.setAttribute('type', 'checkbox');
-		if(todo.done) {
-			checkbox.setAttribute('checked', 'true');
-		}
-		text.className = 'todo-text';
-		editButton.className = 'button-edit';
-		editButton.setAttribute('type', 'button');
-		deleteButton.className = 'button-delete';
-		deleteButton.setAttribute('type', 'button');
 
-		label.append(checkbox);
-		li.append(label);
-		li.append(text);
-		li.append(editButton);
-		li.append(deleteButton);
+		form.setAttribute('method', 'post');
+		form.setAttribute('action', '/api/todos');
+		form.setAttribute('autocomplete', 'off');
+
+		inputUID.className = 'uid';
+		inputUID.setAttribute('type', 'hidden');
+		inputUID.setAttribute('name', 'uid');
+		inputUID.setAttribute('value', todo._id);
+
+		labelInputCheckbox.className = 'label-checkbox-done';
+		labelInputCheckbox.textContent = 'Done';
+
+		inputCheckbox.className = 'checkbox-done';
+		inputCheckbox.setAttribute('type', 'checkbox');
+		inputCheckbox.setAttribute('name', 'done');
+		inputCheckbox.setAttribute('value', 'true');
+		if(todo.done === 'true') {
+			inputCheckbox.setAttribute('checked', '');
+		}
+
+		textTodo.className = 'todo-text';
+
+		text.className = 'span-text';
+		text.textContent = todo.text;
+
+		buttonSave.className = 'button-save';
+		buttonSave.setAttribute('type', 'submit');
+		buttonSave.setAttribute('name', 'button');
+		buttonSave.setAttribute('value', 'save');
+		buttonSave.setAttribute('hidden', '');
+		buttonSave.textContent = 'Save';
+
+		buttonEdit.className = 'button-edit';
+		buttonEdit.setAttribute('type', 'button');
+		buttonEdit.setAttribute('name', 'button');
+		buttonEdit.setAttribute('value', 'edit');
+		buttonEdit.textContent = 'Edit';
+
+		buttonDelete.className = 'button-delete';
+		buttonDelete.setAttribute('type', 'submit');
+		buttonDelete.setAttribute('name', 'button');
+		buttonDelete.setAttribute('value', 'delete');
+		buttonDelete.textContent = 'Delete';
+
+		li.append(form);
+		form.append(inputUID);
+		form.append(labelInputCheckbox);
+		labelInputCheckbox.append(inputCheckbox);
+		form.append(textTodo);
+		if(todo.done === 'true') {
+			strikethrough.append(text);
+			textTodo.append(strikethrough);
+		}
+		else {
+			textTodo.append(text);
+		}
+		form.append(buttonSave);
+		form.append(buttonEdit);
+		form.append(buttonDelete);
 
 		addTodoListeners(li);
 		newTodoList.append(li);
 	});
 
-	todosSection.replaceChildren(newTodoList);
+	currentTodoList.replaceWith(newTodoList);
 }

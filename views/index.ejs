@@ -3,48 +3,30 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Fullstack Todo App</title>
+		<title>Todos</title>
 		<link rel="stylesheet" href="/css/main.css">
 		<script src="/js/main.js" defer></script>
 	</head>
 	<body>
-		<h2>Todos</h2>
-		<%_ if(todos.length === 0) { _%>
-			<p>No todos found</p>
-		<%_ } else { _%>
-			<ul class="list-todos">
-				<%_ for(const {_id, text, done} of todos) { _%>
-					<%_ const checked = done === 'true' ? true : false _%>
-					<li class="todo">
-						<form method="post" action="/api/todos" autocomplete="off">
-							<input type="hidden" name="uid" value="<%= _id %>" class="uid">
-							<label class="label-checkbox-done">Done
-								<input type="checkbox" name="done" value="true" class="checkbox-done" <% if(checked) { _%>checked<%_ } %>>
-							</label>
-							<span class="todo-text">
-								<%_ if(checked) { _%><s><%_ } _%>
-									<input type="text" name="text" value="<%= text %>" class="input-text">
-								<%_ if(checked) { _%></s><%_ } _%>
-							</span>
-							<button type="submit" name="button" value="save" class="button-save">
-								Save
-							</button>
-							<button type="submit" name="button" value="edit" class="button-edit" hidden>
-								Edit
-							</button>
-							<button type="submit" name="button" value="delete" class="button-delete">
-								Delete
-							</button>
-						</form>
-					</li>
-				<%_ } _%>
-			</ul>
-		<%_ } _%>
+		<section class="section-add-todos" aria-labelledby="heading-add-todos">
+			<h2 id="heading-add-todos">Add A Todo</h2>
+			<form action="/api/todos" method="post" id="form-submit" class="form-submit">
+				<label for="form-submit-text" class="form-submit-label">New todo:</label><br><input type="text" name="text" id="form-submit-text" class="form-submit-text" required><button type="submit" name="button" value="submit" class="form-submit-button">Add todo</button>
+			</form>
+		</section>
 
-		<h2>Add A Todo</h2>
-		<form action="/api/todos" method="post" id="form-submit">
-			<label>New todo: <input type="text" name="text" required></label>
-			<button type="submit" name="button" value="submit">Add todo</button>
-		</form>
+		<section aria-labelledby="heading-todos">
+			<h2 id="heading-todos">Todos</h2>
+			<%_ if(todos.length === 0) { _%>
+				<p class="no-todos-placeholder">No todos found</p>
+			<%_ } else { _%>
+				<ul class="list-todos">
+					<%_ for(const {_id, text, done} of todos) { _%>
+						<%_ const checked = done === 'true' ? true : false _%>
+						<li class="todo"><form method="post" action="/api/todos" autocomplete="off"><input type="hidden" name="uid" value="<%= _id %>" class="uid"><label class="label-checkbox-done">Done<input type="checkbox" name="done" value="true" class="checkbox-done" <% if(checked) { _%>checked<%_ } %>></label><span class="todo-text"><%_ if(checked) { _%><s><%_ } _%><input type="text" name="text" value="<%= text %>" class="input-text"><%_ if(checked) { _%></s><%_ } _%></span><button type="submit" name="button" value="save" class="button-save">Save</button><button type="button" name="button" value="edit" class="button-edit" hidden>Edit</button><button type="submit" name="button" value="delete" class="button-delete">Delete</button></form></li>
+					<%_ } _%>
+				</ul>
+			<%_ } _%>
+		</section>
 	</body>
 </html>
