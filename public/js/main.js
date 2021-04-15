@@ -1,64 +1,214 @@
-const formSubmit = document.querySelector('#form-submit');
+// TODO: Display changes message
+// TODO: Manage focus
 
-document.querySelectorAll('.todo').forEach(todo => {
+const formAddTodo = document.querySelector('[data-js="form-add-todo"]');
+
+formAddTodo.addEventListener('submit', addTodo);
+
+document.querySelectorAll('[data-js="list-item-todo"').forEach(todo => {
+	removeTodoFallback(todo);
 	addTodoListeners(todo);
-	hideInput(todo);
 });
 
-formSubmit.querySelector('button[type=submit]').addEventListener('click', addTodo);
-
-
-function addTodoListeners(todo) {
-	const checkboxDone = todo.querySelector('.checkbox-done');
-	const buttonSave = todo.querySelector('.button-save');
-	const buttonEdit = todo.querySelector('.button-edit');
-	const buttonDelete = todo.querySelector('.button-delete');
-
-	checkboxDone.addEventListener('click', toggleTodoDone);
-	buttonSave.addEventListener('click', saveTodoEdit);
-	buttonEdit.addEventListener('click', editTodo);
-	buttonDelete.addEventListener('click', deleteTodo);
+function getTodoNodes(todo) {
+	return {
+		inputUID: todo.querySelector('[data-js="list-item-todo--input-hidden-uid"]'),
+		labelCheckboxDone: todo.querySelector('[data-js="list-item-todo--label-checkbox-done"'),
+		inputCheckboxDone: todo.querySelector('[data-js="list-item-todo--input-checkbox-done"]'),
+		labelTextFallback: todo.querySelector('[data-js="list-item-todo--label-text-fallback"]'),
+		inputTextFallback: todo.querySelector('[data-js="list-item-todo--input-text-fallback"]'),
+		paragraphTodo: todo.querySelector('[data-js="list-item-todo--text-todo"]'),
+		labelTextTodo: todo.querySelector('[data-js="list-item-todo--label-input-text-todo"]'),
+		inputTextTodo: todo.querySelector('[data-js="list-item-todo--input-text-todo"]'),
+		buttonSave: todo.querySelector('[data-js="list-item-todo--button-submit-save"]'),
+		buttonEdit: todo.querySelector('[data-js="list-item-todo--button-edit"]'),
+		buttonCancel: todo.querySelector('[data-js="list-item-todo--button-cancel"]'),
+		buttonDelete: todo.querySelector('[data-js="list-item-todo--button-submit-delete"]')
+	}
 }
 
-async function addTodo(event) {
+function removeTodoFallback(todo) {
+	const nodes = getTodoNodes(todo);
+	const text = nodes.inputTextFallback.getAttribute('value');
+	const replacement = document.createElement('p');
+
+	replacement.setAttribute('data-js', 'list-item-todo--text-todo');
+	if(nodes.inputCheckboxDone.checked) {
+		const strikethrough = document.createElement('s');
+		strikethrough.textContent = text;
+		replacement.append(strikethrough);
+	}
+	else {
+		replacement.textContent = text;
+	}
+
+	nodes.labelTextFallback.replaceWith(replacement);
+
+	nodes.buttonSave.setAttribute('hidden', '');
+	nodes.buttonEdit.removeAttribute('hidden');
+	nodes.buttonCancel.setAttribute('hidden', '');
+	nodes.buttonDelete.removeAttribute('hidden');
+}
+
+function addTodoListeners(todo) {
+	const nodes = getTodoNodes(todo);
+
+	nodes.inputCheckboxDone.addEventListener('click', updateTodoDone);
+	nodes.buttonSave.addEventListener('click', updateTodoText);
+	nodes.buttonEdit.addEventListener('click', showTextInput);
+	nodes.buttonCancel.addEventListener('click', hideTextInput);
+	nodes.buttonDelete.addEventListener('click', deleteTodo);
+}
+
+
+function addTodo(event) {
 	event.preventDefault();
 
+	const form = document.querySelector('[data-js="form-add-todo"]');
+	const text = form.querySelector('[data-js="form-add-todo--input-text-todo"]').value;
+
+	if(text.length === 0) {
+		return;
+	}
+	else {
+		sendPost({text: text}, form);
+	}
+}
+
+function updateTodoDone(event) {
+	const todo = event.currentTarget.closest('[data-js="list-item-todo"]');
+	const nodes = getTodoNodes(todo);
+
+	sendPatch({
+		uid: nodes.inputUID.value,
+		done: nodes.inputCheckboxDone.checked
+	});
+}
+
+function updateTodoText(event) {
+	event.preventDefault();
+
+	const todo = event.currentTarget.closest('[data-js="list-item-todo"]');
+	const nodes = getTodoNodes(todo);
+
+	sendPatch({
+		uid: nodes.inputUID.value,
+		text: nodes.inputTextTodo.value
+	});
+}
+
+function deleteTodo(event) {
+	event.preventDefault();
+
+	const todo = event.currentTarget.closest('[data-js="list-item-todo"]');
+	const nodes = getTodoNodes(todo);
+
+	sendDelete({
+		uid: nodes.inputUID.value
+	});
+}
+
+
+function showTextInput(event) {
+	const todo = event.currentTarget.closest('[data-js="list-item-todo"]');
+	const nodes = getTodoNodes(todo);
+	const label = document.createElement('label');
+	const input = document.createElement('input');
+
+	label.textContent = 'Todo';
+	label.setAttribute('data-js', 'list-item-todo--label-input-text-todo');
+
+	input.setAttribute('type', 'text');
+	input.setAttribute('value', nodes.paragraphTodo.textContent);
+	input.setAttribute('data-js', 'list-item-todo--input-text-todo');
+
+	nodes.labelCheckboxDone.setAttribute('hidden', '');
+
+	nodes.buttonSave.removeAttribute('hidden');
+	nodes.buttonEdit.setAttribute('hidden', '');
+	nodes.buttonCancel.removeAttribute('hidden');
+	nodes.buttonDelete.setAttribute('hidden', '');
+
+	label.append(input);
+
+	nodes.paragraphTodo.replaceWith(label);
+}
+
+function hideTextInput(event) {
+	const todo = event.currentTarget.closest('[data-js="list-item-todo"]');
+	const nodes = getTodoNodes(todo);
+	const textTodo = nodes.inputTextTodo.getAttribute('value');
+	const paragraph = document.createElement('p');
+
+	paragraph.setAttribute('data-js', 'list-item-todo--text-todo');
+	if(nodes.inputCheckboxDone.checked) {
+		const strikethrough = document.createElement('s');
+		strikethrough.textContent = textTodo;
+		paragraph.append(strikethrough);
+	}
+	else {
+		paragraph.textContent = textTodo;
+	}
+
+	nodes.labelCheckboxDone.removeAttribute('hidden');
+
+	nodes.buttonSave.setAttribute('hidden', '');
+	nodes.buttonEdit.removeAttribute('hidden');
+	nodes.buttonCancel.setAttribute('hidden', '');
+	nodes.buttonDelete.removeAttribute('hidden');
+
+	nodes.labelTextTodo.replaceWith(paragraph);
+}
+
+
+async function sendPost(bodyData, form) {
+	const fetchOptions = {
+		method: 'POST',
+		headers: {
+			'Content-type': 'application/json'
+		},
+		body: JSON.stringify(bodyData)
+	};
+
 	try {
-		const todoValue = formSubmit.querySelector('input[name="text"]').value;
-
-		if(todoValue.length === 0) {
-			return;
-		}
-
-		const fetchOptions = {
-			method: 'POST',
-			headers: {
-				'Content-type': 'application/json'
-			},
-			body: JSON.stringify({text: todoValue})
-		};
 		const response = await fetch('/api/todos', fetchOptions);
-		const data = await response.json();
+		const responseData = await response.json();
 
-		updateTodos(data.todos);
-		formSubmit.reset();
+		updateTodos(responseData.todos);
+		form.reset();
 	}
 	catch(err) {
 		console.error(err);
 	}
 };
 
-async function deleteTodo(event) {
-	event.preventDefault();
+async function sendPatch(bodyData) {
+	const fetchOptions = {
+		method: 'PATCH',
+		headers: {
+			'Content-type': 'application/json'
+		},
+		body: JSON.stringify(bodyData)
+	};
 
-	const todo = event.currentTarget.closest('.todo');
-	const uid = todo.querySelector('.uid').value;
+	try {
+		const response = await fetch('/api/todos', fetchOptions);
+		const responseData = await response.json();
+
+		updateTodos(responseData.todos);
+	}
+	catch(err) {
+		console.error(err);
+	}
+};
+
+async function sendDelete(bodyData) {
 	const fetchOptions = {
 		method: 'DELETE',
 		headers: {
 			'Content-type': 'application/json'
 		},
-		body: JSON.stringify({uid: uid})
+		body: JSON.stringify(bodyData)
 	};
 
 	try {
@@ -72,197 +222,100 @@ async function deleteTodo(event) {
 	}
 };
 
-async function toggleTodoDone(event) {
-	const todo = event.currentTarget.closest('.todo');
-	const uid = todo.querySelector('.uid').value;
-	const checkbox = todo.querySelector('.checkbox-done');
-	const fetchOptions = {
-		method: 'PATCH',
-		headers: {
-			'Content-type': 'application/json'
-		},
-		body: JSON.stringify({uid: uid, done: checkbox.checked.toString()})
-	};
 
-	try {
-		const response = await fetch('/api/todos', fetchOptions);
-		const data = await response.json();
+function updateTodos(todos) {
+	const currentOutput = document.querySelector('[data-js="todos-output"]');
 
-		updateTodos(data.todos);
-	}
-	catch(err) {
-		console.error(err);
-	}
-};
+	if(todos.length === 0) {
+		const paragraph = document.createElement('p');
+		paragraph.textContent = 'No todos found';
+		paragraph.setAttribute('data-js', 'todos-output');
 
-function editTodo(event) {
-	event.preventDefault();
-	const todo = event.currentTarget.closest('.todo');
-	showInput(todo);
-};
-
-async function saveTodoEdit(event) {
-	event.preventDefault();
-
-	const todo = event.currentTarget.closest('.todo');
-	const uid = todo.querySelector('.uid').value;
-	const text = todo.querySelector('.input-text').value;
-	const fetchOptions = {
-		method: 'PATCH',
-		headers: {
-			'Content-type': 'application/json'
-		},
-		body: JSON.stringify({uid: uid, text: text})
-	};
-
-	hideInput(todo);
-
-	try {
-		const response = await fetch('/api/todos', fetchOptions);
-		const data = await response.json();
-
-		updateTodos(data.todos);
-	}
-	catch(err) {
-		console.error(err);
-	}
-};
-
-function hideInput(todo) {
-	const inputText = todo.querySelector('.input-text');
-	const labelCheckboxDone = todo.querySelector('.label-checkbox-done');
-	const buttonSave = todo.querySelector('.button-save');
-	const buttonEdit = todo.querySelector('.button-edit');
-	const buttonDelete = todo.querySelector('.button-delete');
-	const text = inputText.value;
-	const span = document.createElement('span');
-
-	labelCheckboxDone.removeAttribute('hidden');
-	buttonSave.setAttribute('hidden', '');
-	buttonEdit.removeAttribute('hidden');
-	buttonDelete.removeAttribute('hidden');
-
-	span.className = 'span-text';
-	span.textContent = text;
-	inputText.replaceWith(span);
-}
-
-function showInput(todo) {
-	const spanText = todo.querySelector('.span-text');
-	const labelCheckboxDone = todo.querySelector('.label-checkbox-done');
-	const buttonSave = todo.querySelector('.button-save');
-	const buttonEdit = todo.querySelector('.button-edit');
-	const buttonDelete = todo.querySelector('.button-delete');
-	const text = spanText.textContent;
-	const input = document.createElement('input');
-
-	labelCheckboxDone.setAttribute('hidden', '');
-	buttonSave.removeAttribute('hidden');
-	buttonEdit.setAttribute('hidden', '');
-	buttonDelete.setAttribute('hidden', '');
-
-	input.className = 'input-text';
-	input.value = text;
-	input.setAttribute('type', 'text');
-	input.setAttribute('name', 'text');
-	spanText.replaceWith(input);
-}
-
-function updateTodos(updatedTodos) {
-	const noTodosPlaceholder = document.querySelector('.no-todos-placeholder');
-	const listTodos = document.querySelector('.list-todos');
-	const currentTodoList = noTodosPlaceholder || listTodos;
-
-	if(updatedTodos.length === 0) {
-		const text = document.createElement('p');
-		text.className = 'no-todos-placeholder';
-		text.textContent = 'No todos found';
-
-		currentTodoList.replaceWith(text);
+		currentOutput.replaceWith(paragraph);
 		return;
 	}
 
-	let newTodoList = document.createElement('ul');
-	newTodoList.className = 'list-todos';
+	const todosList = document.createElement('ul');
+	todosList.setAttribute('data-js', 'todos-output');
 
-	updatedTodos.forEach(todo => {
-		const li = document.createElement('li');
-		const form = document.createElement('form');
+	todos.forEach(todo => {
+		const liTodo = document.createElement('li');
+		const formTodo = document.createElement('form');
 		const inputUID = document.createElement('input');
-		const labelInputCheckbox = document.createElement('label');
+		const labelCheckbox = document.createElement('label');
 		const inputCheckbox = document.createElement('input');
-		const textTodo = document.createElement('span');
-		const strikethrough = document.createElement('s');
-		const text = document.createElement('span');
+		const pTodo = document.createElement('p');
 		const buttonSave = document.createElement('button');
 		const buttonEdit = document.createElement('button');
+		const buttonCancel = document.createElement('button');
 		const buttonDelete = document.createElement('button');
 
-		li.className = 'todo';
+		liTodo.setAttribute('data-js', 'list-item-todo');
 
-		form.setAttribute('method', 'post');
-		form.setAttribute('action', '/api/todos');
-		form.setAttribute('autocomplete', 'off');
+		formTodo.setAttribute('method', 'post');
+		formTodo.setAttribute('acttion', '/api/todos');
+		formTodo.setAttribute('autocomplete', 'off');
 
-		inputUID.className = 'uid';
 		inputUID.setAttribute('type', 'hidden');
 		inputUID.setAttribute('name', 'uid');
 		inputUID.setAttribute('value', todo._id);
+		inputUID.setAttribute('data-js', 'list-item-todo--input-hidden-uid');
 
-		labelInputCheckbox.className = 'label-checkbox-done';
-		labelInputCheckbox.textContent = 'Done';
+		labelCheckbox.textContent = 'Done';
+		labelCheckbox.setAttribute('data-js', 'list-item-todo--label-checkbox-done');
 
-		inputCheckbox.className = 'checkbox-done';
 		inputCheckbox.setAttribute('type', 'checkbox');
 		inputCheckbox.setAttribute('name', 'done');
-		inputCheckbox.setAttribute('value', 'true');
-		if(todo.done === 'true') {
+		inputCheckbox.setAttribute('data-js', 'list-item-todo--input-checkbox-done');
+		if(todo.done) {
 			inputCheckbox.setAttribute('checked', '');
 		}
 
-		textTodo.className = 'todo-text';
+		pTodo.setAttribute('data-js', 'list-item-todo--text-todo');
+		if(todo.done) {
+			const strikethrough = document.createElement('s');
+			strikethrough.textContent = todo.text;
+			pTodo.append(strikethrough);
+		}
+		else {
+			pTodo.textContent = todo.text;
+		}
 
-		text.className = 'span-text';
-		text.textContent = todo.text;
-
-		buttonSave.className = 'button-save';
 		buttonSave.setAttribute('type', 'submit');
 		buttonSave.setAttribute('name', 'button');
 		buttonSave.setAttribute('value', 'save');
+		buttonSave.setAttribute('data-js', 'list-item-todo--button-submit-save');
 		buttonSave.setAttribute('hidden', '');
 		buttonSave.textContent = 'Save';
 
-		buttonEdit.className = 'button-edit';
 		buttonEdit.setAttribute('type', 'button');
-		buttonEdit.setAttribute('name', 'button');
-		buttonEdit.setAttribute('value', 'edit');
+		buttonEdit.setAttribute('data-js', 'list-item-todo--button-edit');
 		buttonEdit.textContent = 'Edit';
 
-		buttonDelete.className = 'button-delete';
+		buttonCancel.setAttribute('type', 'button');
+		buttonCancel.setAttribute('data-js', 'list-item-todo--button-cancel');
+		buttonCancel.setAttribute('hidden', '');
+		buttonCancel.textContent = 'Cancel';
+
 		buttonDelete.setAttribute('type', 'submit');
 		buttonDelete.setAttribute('name', 'button');
 		buttonDelete.setAttribute('value', 'delete');
+		buttonDelete.setAttribute('data-js', 'list-item-todo--button-submit-delete');
 		buttonDelete.textContent = 'Delete';
 
-		li.append(form);
-		form.append(inputUID);
-		form.append(labelInputCheckbox);
-		labelInputCheckbox.append(inputCheckbox);
-		form.append(textTodo);
-		if(todo.done === 'true') {
-			strikethrough.append(text);
-			textTodo.append(strikethrough);
-		}
-		else {
-			textTodo.append(text);
-		}
-		form.append(buttonSave);
-		form.append(buttonEdit);
-		form.append(buttonDelete);
+		liTodo.append(formTodo);
+		formTodo.append(inputUID);
+		formTodo.append(labelCheckbox);
+		labelCheckbox.append(inputCheckbox);
+		formTodo.append(pTodo);
+		formTodo.append(buttonSave);
+		formTodo.append(buttonEdit);
+		formTodo.append(buttonCancel);
+		formTodo.append(buttonDelete);
 
-		addTodoListeners(li);
-		newTodoList.append(li);
-	});
+		addTodoListeners(liTodo);
+		todosList.append(liTodo);
+	})
 
-	currentTodoList.replaceWith(newTodoList);
+	currentOutput.replaceWith(todosList);
 }

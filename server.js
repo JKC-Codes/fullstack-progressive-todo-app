@@ -85,9 +85,7 @@ async function start() {
 				break;
 			case 'save':
 				delete req.body.button;
-				if(req.body.done !== 'true') {
-					req.body.done = 'false';
-				}
+				req.body.done = req.body.done ? true : false;
 				await editTodo(req.body);
 				break;
 			case 'delete': await deleteTodo(req.body.uid);
@@ -97,9 +95,13 @@ async function start() {
 	}
 
 	async function addTodo(text) {
+		if(!/\S/.test(text)) {
+			return;
+		}
+
 		await todoCollection.insertOne({
 			text: text,
-			done: 'false'
+			done: false
 		});
 	}
 
@@ -108,6 +110,10 @@ async function start() {
 		for(const [key, value] of Object.entries(reqBody)) {
 			if(key === 'uid') {
 				continue;
+			}
+			else if(key === 'text' && !/\S/.test(value)) {
+				deleteTodo(reqBody.uid);
+				return;
 			}
 			amendments[key] = value;
 		}
