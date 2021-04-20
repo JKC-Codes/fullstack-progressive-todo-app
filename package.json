@@ -1,5 +1,5 @@
 {
-  "name": "fullstack-todo-app",
+  "name": "fullstack-progressive-todo-app",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,6 @@
   "author": "John Kemp-Cruz (https://jkc.codes/)",
   "license": "MPL-2.0",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",

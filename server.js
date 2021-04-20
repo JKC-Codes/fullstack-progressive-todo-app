@@ -1,4 +1,3 @@
-import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongodb from 'mongodb';
@@ -15,12 +14,10 @@ const MongoClient = new mongodb.MongoClient(connectionString, {
 });
 
 app.use(todoRoutes);
-app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: true}));
 
-todoRoutes.use(cors());
 todoRoutes.use(express.json());
 todoRoutes.use(express.static('public'));
 todoRoutes.use(express.urlencoded({extended: true}));
@@ -46,7 +43,7 @@ async function start() {
 	}
 
 	async function getTodos() {
-		return await todoCollection.find().sort({text: 1}).toArray();
+		return await todoCollection.find().toArray();
 	}
 
 	app.get('/', async (req, res) => {
