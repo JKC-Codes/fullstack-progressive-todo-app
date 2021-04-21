@@ -32,7 +32,8 @@ function removeTodoFallback(todo) {
 	const text = nodes.inputTextFallback.getAttribute('value');
 	const replacement = document.createElement('p');
 
-	replacement.setAttribute('data-js', 'list-item-todo--text-todo');
+	replacement.dataset.js = 'list-item-todo--text-todo';
+
 	if(nodes.inputCheckboxDone.checked) {
 		const strikethrough = document.createElement('s');
 		strikethrough.textContent = text;
@@ -116,11 +117,11 @@ function showTextInput(event) {
 	const input = document.createElement('input');
 
 	label.textContent = 'Todo';
-	label.setAttribute('data-js', 'list-item-todo--label-input-text-todo');
+	label.dataset.js = 'list-item-todo--label-input-text-todo';
 
 	input.setAttribute('type', 'text');
 	input.setAttribute('value', nodes.paragraphTodo.textContent);
-	input.setAttribute('data-js', 'list-item-todo--input-text-todo');
+	input.dataset.js = 'list-item-todo--input-text-todo';
 
 	nodes.labelCheckboxDone.setAttribute('hidden', '');
 
@@ -140,7 +141,7 @@ function hideTextInput(event) {
 	const textTodo = nodes.inputTextTodo.getAttribute('value');
 	const paragraph = document.createElement('p');
 
-	paragraph.setAttribute('data-js', 'list-item-todo--text-todo');
+	paragraph.dataset.js = 'list-item-todo--text-todo';
 	if(nodes.inputCheckboxDone.checked) {
 		const strikethrough = document.createElement('s');
 		strikethrough.textContent = textTodo;
@@ -229,89 +230,44 @@ function updateTodos(todos) {
 	if(todos.length === 0) {
 		const paragraph = document.createElement('p');
 		paragraph.textContent = 'No todos found';
-		paragraph.setAttribute('data-js', 'todos-output');
+		paragraph.dataset.js = 'todos-output';
 
 		currentOutput.replaceWith(paragraph);
 		return;
 	}
 
 	const todosList = document.createElement('ul');
-	todosList.setAttribute('data-js', 'todos-output');
+	todosList.dataset.js = 'todos-output';
 
 	todos.forEach(todo => {
 		const liTodo = document.createElement('li');
-		const formTodo = document.createElement('form');
-		const inputUID = document.createElement('input');
-		const labelCheckbox = document.createElement('label');
-		const inputCheckbox = document.createElement('input');
-		const pTodo = document.createElement('p');
-		const buttonSave = document.createElement('button');
-		const buttonEdit = document.createElement('button');
-		const buttonCancel = document.createElement('button');
-		const buttonDelete = document.createElement('button');
 
-		liTodo.setAttribute('data-js', 'list-item-todo');
+		liTodo.dataset.js = 'list-item-todo';
 
-		formTodo.setAttribute('method', 'post');
-		formTodo.setAttribute('acttion', '/api/todos');
-		formTodo.setAttribute('autocomplete', 'off');
-
-		inputUID.setAttribute('type', 'hidden');
-		inputUID.setAttribute('name', 'uid');
-		inputUID.setAttribute('value', todo._id);
-		inputUID.setAttribute('data-js', 'list-item-todo--input-hidden-uid');
-
-		labelCheckbox.textContent = 'Done';
-		labelCheckbox.setAttribute('data-js', 'list-item-todo--label-checkbox-done');
-
-		inputCheckbox.setAttribute('type', 'checkbox');
-		inputCheckbox.setAttribute('name', 'done');
-		inputCheckbox.setAttribute('data-js', 'list-item-todo--input-checkbox-done');
-		if(todo.done) {
-			inputCheckbox.setAttribute('checked', '');
-		}
-
-		pTodo.setAttribute('data-js', 'list-item-todo--text-todo');
-		if(todo.done) {
-			const strikethrough = document.createElement('s');
-			strikethrough.textContent = todo.text;
-			pTodo.append(strikethrough);
-		}
-		else {
-			pTodo.textContent = todo.text;
-		}
-
-		buttonSave.setAttribute('type', 'submit');
-		buttonSave.setAttribute('name', 'button');
-		buttonSave.setAttribute('value', 'save');
-		buttonSave.setAttribute('data-js', 'list-item-todo--button-submit-save');
-		buttonSave.setAttribute('hidden', '');
-		buttonSave.textContent = 'Save';
-
-		buttonEdit.setAttribute('type', 'button');
-		buttonEdit.setAttribute('data-js', 'list-item-todo--button-edit');
-		buttonEdit.textContent = 'Edit';
-
-		buttonCancel.setAttribute('type', 'button');
-		buttonCancel.setAttribute('data-js', 'list-item-todo--button-cancel');
-		buttonCancel.setAttribute('hidden', '');
-		buttonCancel.textContent = 'Cancel';
-
-		buttonDelete.setAttribute('type', 'submit');
-		buttonDelete.setAttribute('name', 'button');
-		buttonDelete.setAttribute('value', 'delete');
-		buttonDelete.setAttribute('data-js', 'list-item-todo--button-submit-delete');
-		buttonDelete.textContent = 'Delete';
-
-		liTodo.append(formTodo);
-		formTodo.append(inputUID);
-		formTodo.append(labelCheckbox);
-		labelCheckbox.append(inputCheckbox);
-		formTodo.append(pTodo);
-		formTodo.append(buttonSave);
-		formTodo.append(buttonEdit);
-		formTodo.append(buttonCancel);
-		formTodo.append(buttonDelete);
+		liTodo.innerHTML =`<form method="post" action="/api/todos" autocomplete="off">` +
+			`<input type="hidden" name="uid" value="${todo._id}" data-js="list-item-todo--input-hidden-uid">` +
+			`<label data-js="list-item-todo--label-checkbox-done">` +
+				`Done` +
+				`<input type="checkbox" name="done" data-js="list-item-todo--input-checkbox-done" ${todo.done ? 'checked' : ''}>` +
+			`</label>` +
+			`<p data-js="list-item-todo--text-todo">` +
+				`${todo.done ? '<s>' : ''}` +
+				`${todo.text}` +
+				`${todo.done ? '</s>' : ''}` +
+			`</p>` +
+			`<button type="submit" name="button" value="save" data-js="list-item-todo--button-submit-save" hidden>` +
+				`Save` +
+			`</button>` +
+			`<button type="button" data-js="list-item-todo--button-edit">` +
+				`Edit` +
+			`</button>` +
+			`<button type="button" data-js="list-item-todo--button-cancel" hidden>` +
+				`Cancel` +
+			`</button>` +
+			`<button type="submit" name="button" value="delete" data-js="list-item-todo--button-submit-delete">` +
+				`Delete` +
+			`</button>` +
+			`</form>`;
 
 		addTodoListeners(liTodo);
 		todosList.append(liTodo);
