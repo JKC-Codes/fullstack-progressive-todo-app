@@ -8,38 +8,44 @@
 		<script src="/js/main.js" defer></script>
 	</head>
 	<body>
+		<output aria-live="polite" data-js="output--notification--page">site notification</output>
+
 		<section aria-labelledby="heading-add-todos">
 			<h2 id="heading-add-todos">Add A Todo</h2>
-			<form action="/api/todos" method="post" data-js="form-add-todo">
-				<label for="form-add-todo-text">New todo:</label><br><input type="text" name="text" pattern="[^]*\S[^]*" id="form-add-todo-text" data-js="form-add-todo--input-text-todo" required><button type="submit" name="button" value="submit">Add todo</button>
+			<form action="/api/todos" method="post" data-js="form--add-todo--page">
+				<label for="form-add-todo-text">New todo:</label><br><input type="text" name="text" pattern="[^]*\S[^]*" id="form-add-todo-text" data-js="form-add-todo--todo-text" required><button type="submit" name="button" value="submit">Add todo</button>
 			</form>
 		</section>
 
-		<section aria-labelledby="heading-todos">
+		<section aria-labelledby="heading-todos" data-js="section--todos--page">
 			<h2 id="heading-todos">Todos</h2>
 			<%_ if(todos.length === 0) { -%>
-				<p data-js="todos-output">No todos found</p>
+			<output aria-live="polite" data-js="output--todos--count">No todos found</output>
 			<%_ } else { -%>
-				<ul data-js="todos-output">
-					<%_ for(const {_id, text, done} of todos) { -%>
-						<%_ const checked = done ? ' checked' : '' -%>
-						<li data-js="list-item-todo"><%_
-							-%><form method="post" action="/api/todos" autocomplete="off"><%_
-								-%><input type="hidden" name="uid" value="<%= _id %>" data-js="list-item-todo--input-hidden-uid"><%_
-								-%><label data-js="list-item-todo--label-checkbox-done">Done<%_
-									-%><input type="checkbox" name="done" data-js="list-item-todo--input-checkbox-done"<%= checked %>><%_
-								-%></label><%_
-								-%><label data-js="list-item-todo--label-text-fallback">Todo<%_
-									-%><input type="text" name="text" value="<%= text %>" data-js="list-item-todo--input-text-fallback"><%_
-								-%></label><%_
-								-%><button type="submit" name="button" value="save" data-js="list-item-todo--button-submit-save">Save</button><%_
-								-%><button type="button" data-js="list-item-todo--button-edit" hidden>Edit</button><%_
-								-%><button type="button" data-js="list-item-todo--button-cancel" hidden>Cancel</button><%_
-								-%><button type="submit" name="button" value="delete" data-js="list-item-todo--button-submit-delete">Delete</button><%_
-							-%></form><%_
-						-%></li>
-					<%_ } -%>
-				</ul>
+			<output aria-live="polite" data-js="output--todos--count"><%- `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete` %></output>
+			<ul data-js="ul--todos--todos-list">
+				<%_ for(const {_id, text, done} of todos) { -%>
+					<%_ const checked = done ? ' checked' : '' -%>
+					<li data-js="li--todos-list--todo"><%_
+						-%><form method="post" action="/api/todos" autocomplete="off" aria-labelledby="todo-text-<%= _id %>"><%_
+							-%><input type="hidden" name="uid" value="<%= _id %>" data-js="input--todo--hidden-uid"><%_
+							-%><label data-js="label--todo--checkbox-done">Done<%_
+								-%><input type="checkbox" name="done" data-js="input--todo--checkbox-done"<%= checked %>><%_
+							-%></label><%_
+							-%><label data-js="label--todo--text">Todo<%_
+								-%><input type="text" name="text" value="<%= text %>" data-js="input--todo--text"><%_
+							-%></label><%_
+							-%><p id="todo-text-<%= _id %>" data-js="p--todo--text" hidden><%_
+								-%><%- done ? `<s>${text}</s>` : text %><%_
+							-%></p><%_
+							-%><button type="submit" name="button" value="save" data-js="button--todo--save">Save</button><%_
+							-%><button type="button" data-js="button--todo--edit" hidden>Edit</button><%_
+							-%><button type="button" data-js="button--todo--cancel" hidden>Cancel</button><%_
+							-%><button type="submit" name="button" value="delete" data-js="button--todo--delete">Delete</button><%_
+						-%></form><%_
+					-%></li>
+				<%_ } -%>
+			</ul>
 			<%_ } -%>
 		</section>
 	</body>
