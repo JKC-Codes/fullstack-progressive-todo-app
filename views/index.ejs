@@ -8,21 +8,21 @@
 		<script src="/js/main.js" defer></script>
 	</head>
 	<body>
-		<output aria-live="polite" data-js="output--notification--page">site notification</output>
+		<output class="output--notification--page" aria-live="polite" data-js="output--notification--page"></output>
 
-		<section aria-labelledby="heading-add-todos">
+		<section class="section--add-todos--page" aria-labelledby="heading-add-todos">
 			<h2 id="heading-add-todos">Add A Todo</h2>
 			<form action="/api/todos" method="post" data-js="form--add-todo--page">
-				<label for="form-add-todo-text">New todo:</label><br><input type="text" name="text" pattern="[^]*\S[^]*" id="form-add-todo-text" data-js="form-add-todo--todo-text" required><button type="submit" name="button" value="submit">Add todo</button>
+				<label for="form-add-todo-text">New todo:</label><br><input class="input--add-todo-form--new-todo" type="text" name="text" pattern="[^]*\S[^]*" id="form-add-todo-text" data-js="form-add-todo--todo-text" required><button class="button--add-todo-form--submit" type="submit" name="button" value="submit">Add todo</button>
 			</form>
 		</section>
 
 		<section aria-labelledby="heading-todos" data-js="section--todos--page">
 			<h2 id="heading-todos">Todos</h2>
 			<%_ if(todos.length === 0) { -%>
-			<output aria-live="polite" data-js="output--todos--count">No todos found</output>
+			<output class="output--todos--count" aria-live="polite" data-js="output--todos--count">No todos found</output>
 			<%_ } else { -%>
-			<output aria-live="polite" data-js="output--todos--count"><%- `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete` %></output>
+			<output class="output--todos--count" aria-live="polite" data-js="output--todos--count"><%- `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete` %></output>
 			<ul data-js="ul--todos--todos-list">
 				<%_ for(const {_id, text, done} of todos) { -%>
 					<%_ const checked = done ? ' checked' : '' -%>

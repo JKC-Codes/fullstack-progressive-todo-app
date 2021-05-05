@@ -1,4 +1,3 @@
-// TODO: Display changes message
 // TODO: Manage focus
 
 const formAddTodo = document.querySelector('[data-js="form--add-todo--page"]');
@@ -100,7 +99,16 @@ async function handleChange(event) {
 }
 
 function notify(text) {
-	console.log(text);
+	const notification = document.querySelector('[data-js="output--notification--page"]');
+	const timeoutValue = setTimeout(() => {
+		if(timeoutValue.toString() === notification.dataset.timeout) {
+			notification.classList.remove('js-show');
+		}
+	}, 2000, notification);
+
+	notification.textContent = text;
+	notification.dataset.timeout = timeoutValue;
+	notification.classList.add('js-show');
 }
 
 async function updateDatabase(bodyData, method) {
@@ -199,5 +207,8 @@ function updateTodos(todos) {
 		sectionTodos.append(listTodosNew);
 	}
 
-	outputTodos.textContent = `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete`;
+	const newTodosCount = `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete`;
+	if(newTodosCount !== outputTodos.textContent) {
+		outputTodos.textContent = newTodosCount;
+	}
 }
