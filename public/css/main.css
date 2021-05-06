@@ -1,0 +1,24 @@
+.output--notification--page {
+	position: fixed;
+	z-index: 2;
+	top: 2rem;
+	left: 50%;
+	transition: 0.1s ease-in-out;
+	transition-property: visibility, opacity, transform;
+	background: hsla(240, 100%, 100%, 0.85);
+	padding: 0.5rem 1rem;
+	border: 2px solid midnightblue;
+	border-radius: 0.5rem;
+}
+
+.output--notification--page[data-js="output--notification--page"] {
+	visibility: hidden;
+	opacity: 0;
+	transform: translate(-50%, -100%);
+}
+
+.output--notification--page[data-js="output--notification--page"].js-show {
+	visibility: visible;
+	opacity: 1;
+	transform: translate(-50%, 0%);
+}
