@@ -6,5 +6,5 @@ An experiment in building a fullstack, accessible and progressively enhanced tod
 - [x] Retain full functionality when JavaScript fails to load
 - [x] Readable when CSS fails to load
 - [x] Fully navigable with a keyboard
-- [ ] Updates announced by screen readers
+- [x] Updates announced by screen readers
 - [ ] Manage focus state when updating the DOM
