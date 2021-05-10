@@ -1,3 +1,108 @@
+/* Resets */
+
+*,
+*::before,
+::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+button,
+input {
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	text-transform: none;
+}
+
+button[type="button"],
+button[type="submit"] {
+	-webkit-appearance: button;
+}
+
+button[type="button"]::-moz-focus-inner,
+button[type="submit"]::-moz-focus-inner {
+	border-style: none;
+	padding: 0;
+}
+
+button[type="button"]::-moz-focusring,
+button[type="submit"]::-moz-focusring {
+	outline: 1px dotted ButtonText;
+}
+
+
+/* Base Styles */
+
+html {
+	margin: auto;
+	color: hsl(240, 10%, 10%);
+	font: 125%/1.5 arial, sans-serif;
+}
+
+body {
+	padding: 2rem;
+	background: hsl(240, 10%, 85%);
+	display: grid;
+	grid-template: auto auto / minmax(12rem, 40rem);
+	justify-content: center;
+}
+
+h2 {
+	margin: 3rem 0 1.38rem;
+  font-weight: 700;
+	font-size: 3.157rem;
+	line-height: 1.3;
+}
+
+button,
+input {
+	padding: 0.25rem 0.5rem;
+}
+
+button {
+	background: midnightblue;
+	color: hsl(240, 10%, 95%);
+	border: 1px solid hsl(240, 10%, 25%);
+	border-radius: 0.5rem;
+}
+
+button:hover,
+button:focus {
+	background: hsl(240, 65%, 35%);
+	cursor: pointer;
+}
+
+button:active {
+	background: midnightblue;
+	transform: scale(1.05);
+}
+
+input {
+	border: 1px solid transparent;
+	padding: 0.25rem 0.75rem;
+}
+
+input:focus {
+	outline: none;
+	border-color: transparent;
+	border-left-color: midnightblue;
+	border-left-width: 0.2rem;
+	padding-left: calc(0.55rem + 1px);
+}
+
+ul {
+	padding-left: 1rem;
+}
+
+form {
+	display: inline-block;
+}
+
+
+/* Styles */
+
 .output--notification--page {
 	position: fixed;
 	z-index: 2;
