@@ -8,7 +8,7 @@
 		<script src="/js/main.js" defer></script>
 	</head>
 	<body>
-		<output class="output--notification--page" aria-live="polite" data-js="output--notification--page"></output>
+		<output class="output--notification--page" role="status" data-js="output--notification--page"></output>
 
 		<section class="section--add-todos--page" aria-labelledby="heading-add-todos">
 			<h2 id="heading-add-todos">Add A Todo</h2>
@@ -20,10 +20,9 @@
 		<section aria-labelledby="heading-todos" data-js="section--todos--page">
 			<h2 id="heading-todos">Todos</h2>
 			<%_ if(todos.length === 0) { -%>
-			<output class="output--todos--count" aria-live="polite" data-js="output--todos--count">No todos found</output>
+			<output class="output--todos--count" role="status" data-js="output--todos--count">No todos found</output>
 			<%_ } else { -%>
-			<output class="output--todos--count" aria-live="polite" data-js="output--todos--count"><%- `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete` %></output>
-			<ul data-js="ul--todos--todos-list">
+			<output class="output--todos--count" role="status" data-js="output--todos--count"><%- `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete` %></output>
 				<%_ for(const {_id, text, done} of todos) { -%>
 					<%_ const checked = done ? ' checked' : '' -%>
 					<li data-js="li--todos-list--todo"><%_
