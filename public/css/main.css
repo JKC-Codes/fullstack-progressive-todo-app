@@ -57,7 +57,9 @@ h2 {
 }
 
 button,
-input {
+input[type="text"] {
+	min-height: 44px;
+	min-width: 44px;
 	padding: 0.25rem 0.5rem;
 }
 
@@ -68,10 +70,20 @@ button {
 	border-radius: 0.5rem;
 }
 
-button:hover,
-button:focus {
+button:hover {
 	background: hsl(240, 65%, 35%);
 	cursor: pointer;
+}
+
+button:focus {
+	outline: 4px solid midnightblue;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 2px white;
+}
+
+button:not(:focus-visible) {
+	outline: none;
+	box-shadow: none;
 }
 
 button:active {
@@ -79,17 +91,16 @@ button:active {
 	transform: scale(1.05);
 }
 
-input {
-	border: 1px solid transparent;
+input[type="text"] {
+	border: 2px solid hsl(240, 10%, 75%);
 	padding: 0.25rem 0.75rem;
 }
 
-input:focus {
+input[type="text"]:focus {
 	outline: none;
-	border-color: transparent;
-	border-left-color: midnightblue;
-	border-left-width: 0.2rem;
-	padding-left: calc(0.55rem + 1px);
+	border: 2px solid midnightblue;
+	border-left-width: 6px;
+	padding-left: calc(0.75rem - 4px);
 }
 
 ul {
@@ -101,7 +112,7 @@ form {
 }
 
 
-/* Styles */
+/* Update notification */
 
 .output--notification--page {
 	position: fixed;
@@ -110,9 +121,10 @@ form {
 	left: 50%;
 	transition: 0.1s ease-in-out;
 	transition-property: visibility, opacity, transform;
-	background: hsla(240, 100%, 100%, 0.85);
+	background: hsla(240, 100%, 100%, 0.9);
 	padding: 0.5rem 1rem;
-	border: 2px solid midnightblue;
+	width: max-content;
+	border: 2px solid hsl(240, 10%, 75%);;
 	border-radius: 0.5rem;
 }
 
