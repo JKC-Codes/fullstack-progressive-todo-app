@@ -139,3 +139,30 @@ form {
 	opacity: 1;
 	transform: translate(-50%, 0%);
 }
+
+
+/* Add todo */
+
+.section--add-todos--page {
+	padding-bottom: 2rem;
+	border-bottom: 1px solid hsl(240, 10%, 75%);
+}
+
+.button--add-todo-form--submit {
+	margin-top: 0.5rem;
+}
+
+@media(min-width: 26.65rem) {
+	.input--add-todo-form--new-todo[type="text"],
+	.input--add-todo-form--new-todo[type="text"]:focus {
+		border-top-left-radius: 0.5rem;
+		border-bottom-left-radius: 0.5rem;
+		border-right-width: 0;
+	}
+
+	.button--add-todo-form--submit {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+}
+
