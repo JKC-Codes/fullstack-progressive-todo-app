@@ -23,24 +23,25 @@
 			<output class="output--todos--count" role="status" data-js="output--todos--count">No todos found</output>
 			<%_ } else { -%>
 			<output class="output--todos--count" role="status" data-js="output--todos--count"><%- `${todos.filter(todo => todo.done).length} of ${todos.length} todos complete` %></output>
+			<ul class="ul--todos--todos-list" data-js="ul--todos--todos-list">
 				<%_ for(const {_id, text, done} of todos) { -%>
 					<%_ const checked = done ? ' checked' : '' -%>
-					<li data-js="li--todos-list--todo"><%_
-						-%><form method="post" action="/api/todos" autocomplete="off" aria-labelledby="todo-text-<%= _id %>"><%_
+					<li class="li--todos-list--todo" data-js="li--todos-list--todo"><%_
+						-%><form method="post" action="/api/todos" autocomplete="off" aria-labelledby="todo-text-<%= _id %>" class="form--todo--form"><%_
 							-%><input type="hidden" name="uid" value="<%= _id %>" data-js="input--todo--hidden-uid"><%_
-							-%><label data-js="label--todo--checkbox-done">Done<%_
+							-%><label class="label--todo--checkbox-done" data-js="label--todo--checkbox-done"><span class="label--todo--span-text">Done</span><%_
 								-%><input type="checkbox" name="done" data-js="input--todo--checkbox-done"<%= checked %>><%_
 							-%></label><%_
-							-%><label data-js="label--todo--text">Todo<%_
+							-%><label class="label--todo--text" data-js="label--todo--text">Todo<%_
 								-%><input type="text" name="text" value="<%= text %>" data-js="input--todo--text"><%_
 							-%></label><%_
-							-%><p id="todo-text-<%= _id %>" data-js="p--todo--text" hidden><%_
+							-%><p class="p--todo--text" id="todo-text-<%= _id %>" data-js="p--todo--text" hidden><%_
 								-%><%- done ? `<s>${text}</s>` : text %><%_
 							-%></p><%_
-							-%><button type="submit" name="button" value="save" data-js="button--todo--save">Save</button><%_
-							-%><button type="button" data-js="button--todo--edit" hidden>Edit</button><%_
-							-%><button type="button" data-js="button--todo--cancel" hidden>Cancel</button><%_
-							-%><button type="submit" name="button" value="delete" data-js="button--todo--delete">Delete</button><%_
+							-%><button type="submit" name="button" value="save" class="button--todo--left" data-js="button--todo--save">Save</button><%_
+							-%><button type="button" class="button--todo--left" data-js="button--todo--edit" hidden>Edit</button><%_
+							-%><button type="button" class="button--todo--right" data-js="button--todo--cancel" hidden>Cancel</button><%_
+							-%><button type="submit" name="button" class="button--todo--right" value="delete" data-js="button--todo--delete">Delete</button><%_
 						-%></form><%_
 					-%></li>
 				<%_ } -%>

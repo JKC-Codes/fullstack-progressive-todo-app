@@ -175,3 +175,74 @@ form {
 	margin: 1.5em 0;
 }
 
+
+/* Todos list */
+
+.ul--todos--todos-list {
+	list-style: none;
+	padding: 0;
+}
+
+.li--todos-list--todo {
+	margin: 1em 0 2em;
+	padding-top: 2em;
+}
+
+.li--todos-list--todo:not(:first-child) {
+	border-top: 1px solid hsl(240, 10%, 75%);
+}
+
+
+/* Todo items */
+
+.form--todo--form {
+	display: grid;
+	grid-template-columns: auto auto 1fr;
+	grid-template-rows: auto auto;
+	grid-row-gap: 0.5rem;
+	align-items: start;
+	justify-items: start;
+}
+
+.label--todo--checkbox-done,
+.label--todo--checkbox-done input[type="checkbox"] {
+	cursor: pointer;
+}
+
+.label--todo--checkbox-done:not([hidden]) {
+	display: flex;
+	flex-wrap: wrap;
+	grid-row: span 2;
+	font-size: 0.8rem;
+	width: 5ch;
+	margin-right: 0.8rem;
+}
+
+.label--todo--span-text {
+	width: 100%;
+	text-align: center;
+}
+
+.label--todo--checkbox-done input[type="checkbox"] {
+	order: -1;
+	width: 3ch;
+	height: 3ch;
+	flex: 1 0 4ch;
+}
+
+.p--todo--text {
+	grid-column: span 2;
+}
+
+.label--todo--text {
+	grid-column: 2 / 4;
+}
+
+.button--todo--left {
+	grid-column: 2;
+	margin-right: 0.5rem;
+}
+
+.button--todo--right {
+	grid-column: 3;
+}

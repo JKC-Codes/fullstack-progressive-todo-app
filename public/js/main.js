@@ -1,5 +1,3 @@
-// TODO: Manage focus
-
 const formAddTodo = document.querySelector('[data-js="form--add-todo--page"]');
 const todos = document.querySelectorAll('[data-js="li--todos-list--todo"]');
 
@@ -159,38 +157,40 @@ function updateTodos(todos) {
 	}
 
 	const listTodosNew = document.createElement('ul');
+	listTodosNew.classList.add('ul--todos--todos-list');
 	listTodosNew.dataset.js = 'ul--todos--todos-list';
 
 	todos.forEach(todo => {
 		const liTodo = document.createElement('li');
 
+		liTodo.classList.add('li--todos-list--todo');
 		liTodo.dataset.js = 'li--todos-list--todo';
 
-		liTodo.innerHTML =`<form method="post" action="/api/todos" autocomplete="off" aria-labelledby="todo-text-${todo._id}">` +
+		liTodo.innerHTML =`<form method="post" action="/api/todos" autocomplete="off" aria-labelledby="todo-text-${todo._id}" class="form--todo--form">` +
 			`<input type="hidden" name="uid" value="${todo._id}" data-js="input--todo--hidden-uid">` +
-			`<label data-js="label--todo--checkbox-done">` +
-				`Done` +
+			`<label class="label--todo--checkbox-done" data-js="label--todo--checkbox-done">` +
+				`<span class="label--todo--span-text">Done</span>` +
 				`<input type="checkbox" name="done" data-js="input--todo--checkbox-done" ${todo.done ? 'checked' : ''}>` +
 			`</label>` +
-			`<label data-js="label--todo--text" hidden>` +
+			`<label class="label--todo--text" data-js="label--todo--text" hidden>` +
 				`Todo` +
 				`<input type="text" name="text" value="${todo.text}" data-js="input--todo--text">` +
 			`</label>` +
-			`<p id="todo-text-${todo._id}" data-js="p--todo--text">` +
+			`<p class="p--todo--text" id="todo-text-${todo._id}" data-js="p--todo--text">` +
 				`${todo.done ? '<s>' : ''}` +
 				`${todo.text}` +
 				`${todo.done ? '</s>' : ''}` +
 			`</p>` +
-			`<button type="submit" name="button" value="save" data-js="button--todo--save" hidden>` +
+			`<button type="submit" name="button" value="save" class="button--todo--left" data-js="button--todo--save" hidden>` +
 				`Save` +
 			`</button>` +
-			`<button type="button" data-js="button--todo--edit">` +
+			`<button type="button" class="button--todo--left" data-js="button--todo--edit">` +
 				`Edit` +
 			`</button>` +
-			`<button type="button" data-js="button--todo--cancel" hidden>` +
+			`<button type="button" class="button--todo--right" data-js="button--todo--cancel" hidden>` +
 				`Cancel` +
 			`</button>` +
-			`<button type="submit" name="button" value="delete" data-js="button--todo--delete">` +
+			`<button type="submit" name="button" value="delete" class="button--todo--right" data-js="button--todo--delete">` +
 				`Delete` +
 			`</button>` +
 			`</form>`
